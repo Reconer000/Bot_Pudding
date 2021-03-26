@@ -1,0 +1,8 @@
+__pycache__
+.pyproj
+obj
+.vs
+log.txt
+secret_config.json
+config.json
+bkp
