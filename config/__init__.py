@@ -10,9 +10,9 @@ empty_config = {
     "cogs.osu"
   ],
   "osu_config": {
-    "info": "roles cannot currently be changed, it will break the bot",
+    "info": "'roles' cannot currently be changed, as it will break the bot. And 'servers' will be set up automatically, with the -reg command.",
     "roles": [
-    "1-9k",
+    "0-9k",
     "10-29k",
     "30-49k",
     "50-69k",

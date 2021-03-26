@@ -21,7 +21,7 @@ OWNER = config.get("Owner")
 BOT_PREFIX = config.get("Prefix")
 
 client = Bot(command_prefix=BOT_PREFIX)
-version = "2.1.0-x"
+version = "1.0"
 
 
 @client.event
@@ -103,4 +103,9 @@ async def info(ctx):
 try:
   client.run(sc["TOKEN"])
 except:
-  print("Please go to /Bot_Pudding/config/ and set up both json files.")
+  print('''
+  \n-----------------------\n
+  Please go to \Bot_Pudding\config\ 
+  and set up both json files.
+  \n-----------------------\n
+  ''')

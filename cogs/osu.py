@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import asyncio
 import discord
 import requests
 from discord import utils
@@ -107,6 +108,7 @@ class osu(commands.Cog):
                 member = await guild.fetch_member(int(discord_id))
 
                 # Get user rank from osu.ppy.sh with oauth2 token 
+                await asyncio.sleep(1)
                 user_data = requests.get("https://osu.ppy.sh/api/v2/users/{}/osu".format(osu_id), headers={"Authorization": "Bearer {}".format(token)}).json()
                 user_stats = user_data.get("statistics")
                 rank = user_stats.get("global_rank") // 1000
@@ -120,8 +122,11 @@ class osu(commands.Cog):
 
                     # Convert role names into ints to determine what role to give each user
                     rank_ranges = [int(j) for j in re.sub("[k]", '', name).split("-")]
-                    if rank_ranges[0] < rank < rank_ranges[1]:
+                    if rank_ranges[0] <= rank <= rank_ranges[1]:
                         await member.add_roles(role)
+                    else:
+                        await member.remove_roles(role)
+        
 
 
 def setup(client):
