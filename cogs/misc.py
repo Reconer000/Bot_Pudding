@@ -18,16 +18,6 @@ class Misc(commands.Cog):
         result = random.randint(1, int(dice))
         await ctx.send("{} rolls {}".format(ctx.message.author.mention, str(result)))
 
-    @commands.command(name="gtfo", brief="", pass_context=True)
-    async def gtfo(self, ctx, role_name: str):
-        total = 0
-        if '_' in role_name:
-            role_name = role_name.replace('_',' ')
-        for i in ctx.guild.roles:
-            if i.name == role_name:
-                total += 1
-                await i.delete(reason = 'gtfo')
-        await ctx.send('{} {} deleted'.format(role_name, total))
 
 def setup(client):
     client.add_cog(Misc(client))

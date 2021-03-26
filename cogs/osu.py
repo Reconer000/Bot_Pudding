@@ -26,7 +26,7 @@ data = {
 }
 
 
-class cog_name(commands.Cog):
+class osu(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.get_ranks.start()
@@ -125,4 +125,4 @@ class cog_name(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(cog_name(client))
+    client.add_cog(osu(client))

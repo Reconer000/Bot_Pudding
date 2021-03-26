@@ -75,7 +75,6 @@ async def cog(ctx, method: str, extension: str):
     extension = "cogs." + extension
 
     if ctx.author.guild_permissions.administrator:
-        config = fileloader.reload("config")
 
         if extension in extensions:
             try:
@@ -99,6 +98,6 @@ async def purge(ctx, llimit: str):
 
 @client.command(name="info")
 async def info(ctx):
-    await ctx.send("anythingf but")
+    await ctx.send("https://github.com/Reconer000/Bot_Pudding")
 
 client.run(sc["TOKEN"])
