@@ -100,4 +100,7 @@ async def purge(ctx, llimit: str):
 async def info(ctx):
     await ctx.send("https://github.com/Reconer000/Bot_Pudding")
 
-client.run(sc["TOKEN"])
+try:
+  client.run(sc["TOKEN"])
+except:
+  print("Please go to /Bot_Pudding/config/ and set up both json files.")
