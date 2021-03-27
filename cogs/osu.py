@@ -143,17 +143,14 @@ class osu(commands.Cog):
             guild = self.client.get_guild(int(server_id))
             users = server.get("users")
             role_names = config["osu_config"]["roles"]
-            print(guild.name)
 
             for discord_id in users:
                 osu_id = users.get(discord_id)
                 member = await guild.fetch_member(int(discord_id))
 
                 if discord_id in cache:
-                    print(" Using cache for {}.".format(member.name))
                     await set_roles(cache.get(discord_id))
                 else:
-                    print(" Getting {} stats.".format(member.name))
 
                     # Limit osu requests to make sure you dont get 
                     # yelled at by peppy. Dont remove this. 
