@@ -62,6 +62,25 @@ class osu(commands.Cog):
             else:
                 await ctx.send("You dont have the manage roles permission.")
 
+        # Check for -d
+        elif input == "-d":
+            try:
+
+                # Remove object from config.json
+                if str(ctx.message.author.id) in config["osu_config"]["servers"][server_id]["users"]:
+                    tmp = config["osu_config"]["servers"][server_id]["users"]
+                    del tmp[str(ctx.message.author.id)]
+                    config["osu_config"]["servers"][server_id]["users"] = tmp
+                    os.remove(config_file_location)
+                    with open(config_file_location, 'w') as config_file:
+                        json.dump(config, config_file, indent=2)
+
+                    await ctx.send("Successfully removed {}.".format(ctx.message.author.name))
+                else:
+                    await ctx.send("User not found.")
+            except:
+                await ctx.send("Failed.")
+
         # Check for osu id
         elif "https://osu.ppy.sh/users/" in input:
             try:
@@ -76,8 +95,8 @@ class osu(commands.Cog):
                             json.dump(config, config_file, indent=2)
 
                         await ctx.send("{} successfully registered as {}.".format(ctx.message.author.name, input))
-                    except:
-                        await ctx.send("Failed.")
+                    except Exception as e:
+                        await ctx.send("Failed. "+e)
                 else:
                     await ctx.send("You're already registered.")
             except:
@@ -93,40 +112,61 @@ class osu(commands.Cog):
     @tasks.loop(minutes=10.0)
     async def get_ranks(self):
 
+        # Used for users who are in multiple servers with
+        # this bot.
+        cache = {
+        }
+
         # Get osu!api oauth2 token
         auth = requests.post("https://osu.ppy.sh/oauth/token", data=data).json()
         token = auth.get('access_token')
+
+
+        async def set_roles(rank):
+            for name in role_names:
+                role = utils.get(guild.roles, name = name)
+
+                # Add roles to server if they dont exist
+                if role == None:
+                    await guild.create_role(name = name, hoist = True)
+
+                # Convert role names into ints to determine what role to give each user
+                rank_ranges = [int(j) for j in re.sub("[k]", '', name).split("-")]
+                if rank_ranges[0] <= rank <= rank_ranges[1]:
+                    await member.add_roles(role)
+                else:
+                    await member.remove_roles(role)
+
 
         for server_id in config["osu_config"]["servers"]:
             server = config["osu_config"]["servers"][server_id]
             guild = self.client.get_guild(int(server_id))
             users = server.get("users")
             role_names = config["osu_config"]["roles"]
+            print(guild.name)
 
             for discord_id in users:
                 osu_id = users.get(discord_id)
                 member = await guild.fetch_member(int(discord_id))
 
-                # Get user rank from osu.ppy.sh with oauth2 token 
-                await asyncio.sleep(1)
-                user_data = requests.get("https://osu.ppy.sh/api/v2/users/{}/osu".format(osu_id), headers={"Authorization": "Bearer {}".format(token)}).json()
-                user_stats = user_data.get("statistics")
-                rank = user_stats.get("global_rank") // 1000
+                if discord_id in cache:
+                    print(" Using cache for {}.".format(member.name))
+                    await set_roles(cache.get(discord_id))
+                else:
+                    print(" Getting {} stats.".format(member.name))
 
-                for name in role_names:
-                    role = utils.get(guild.roles, name = name)
+                    # Limit osu requests to make sure you dont get 
+                    # yelled at by peppy. Dont remove this. 
+                    # Rate limits exist for a reason
+                    await asyncio.sleep(1.2)
 
-                    # Add roles to server if they dont exist
-                    if role == None:
-                        await guild.create_role(name = name, hoist = True)
+                    # Get user rank from osu.ppy.sh with oauth2 token
+                    user_data = requests.get("https://osu.ppy.sh/api/v2/users/{}/osu".format(osu_id), headers={"Authorization": "Bearer {}".format(token)}).json()
+                    user_stats = user_data.get("statistics")
+                    rank = user_stats.get("global_rank") // 1000
 
-                    # Convert role names into ints to determine what role to give each user
-                    rank_ranges = [int(j) for j in re.sub("[k]", '', name).split("-")]
-                    if rank_ranges[0] <= rank <= rank_ranges[1]:
-                        await member.add_roles(role)
-                    else:
-                        await member.remove_roles(role)
-        
+                    cache[discord_id] = rank
+                    await set_roles(rank)
 
 
 def setup(client):
