@@ -42,6 +42,7 @@ async def on_ready():
             client.load_extension(extension)
         except Exception as e:
             print(f"Failed to load {extension}.")
+            print(e)
 
     print('------------')
 

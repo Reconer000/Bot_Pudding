@@ -9,6 +9,12 @@ empty_config = {
     "cogs.misc",
     "cogs.osu"
   ],
+  "automod": {
+    "verify_channels": [
+      ""
+    ],
+    "member_role": ""
+  },
   "osu_config": {
     "info": "'roles' cannot currently be changed, as it will break the bot. And 'servers' will be set up automatically, with the -reg command.",
     "roles": [

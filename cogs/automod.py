@@ -1,12 +1,13 @@
-
+import json
 import discord
 from discord import utils
 from discord.ext import commands
-from utils import fileloader, logd
 
 
-config = fileloader.j("config/config.json")
-automod_config = config.get("Automod_config")
+config_file_location = "config/config.json"
+
+with open(config_file_location, "r") as config_file:
+    config = json.load(config_file)
 
 
 class Auto_Mod(commands.Cog):
@@ -15,23 +16,9 @@ class Auto_Mod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel.id in automod_config.get("protected_channels"):
-            try:
-                if message.attachments[0].url.endswith(tuple(automod_config.get("allowed_files"))):
-                    pass
-                else:
-                    await message.delete()
-                    await message.channel.send("That filetype cannot be sent here.")
-            except:
-                return
-
-        elif message.channel.id in tuple(automod_config.get("verify_channel")):
-            await message.author.add_roles(utils.get(message.author.guild.roles, name = automod_config.get("member_role")))
-            print(message.author.guild)
+        if str(message.channel.id) in config["automod"]["verify_channels"]:
+            await message.author.add_roles(utils.get(message.author.guild.roles, id = int(config["automod"]["member_role"])))
             await message.delete()
-
 
 def setup(client):
     client.add_cog(Auto_Mod(client))
-
-    #this is all fucking stupid
